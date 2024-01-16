@@ -1,0 +1,58 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <DHT.h>
+
+const char *ssid = "Marli";
+const char *password = "Chacarabeijaflor@1975";
+const char *scriptUrl = "https://script.google.com/macros/s/AKfycbwEFsgGfAGaC6nW4nlWkBjgT7CPO5JSt8lGQQuKqA8fRo_S_xSvR6bGUPR2ZkyV60H1dA/exec";  // Substitua com a URL do seu Google Apps Script
+
+#define DHTPIN 5  // Pino de dados do DHT11 conectado ao pino GPIO5 (D5)
+#define DHTTYPE DHT11  // Tipo do sensor DHT
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void enviarDados() {
+  // Ler dados do sensor DHT11
+  float temperatura = dht.readTemperature();
+  float umidade = dht.readHumidity();
+
+  // Adicionar a umidadeSoloAtual
+  int umidadeSoloAtual = 86;
+
+  // Construir string de dados a serem enviados
+  String dados = "temperatura=" + String(temperatura) + "&umidade=" + String(umidade) + "&umidadeSoloAtual=" + String(umidadeSoloAtual) + "&hora=12:00&data=2022-01-01";
+
+  HTTPClient http;
+  http.begin(scriptUrl);
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+  int httpCode = http.POST(dados);
+
+  if (httpCode > 0) {
+    String payload = http.getString();
+    Serial.println("Envio dos dados concluido");
+  } else {
+    Serial.println("Falha ao enviar dados para o Google Apps Script.");
+  }
+
+  http.end();
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+
+  Serial.println("Connected to WiFi");
+
+  dht.begin();  // Inicializar o sensor DHT11
+}
+
+void loop() {
+  delay(5000); 
+  enviarDados();
+}
