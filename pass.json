@@ -1,0 +1,13 @@
+[
+  {
+    "Nome": "Jeferson",
+    "Nome de Usuário": "jef",
+    "Senha": "113"
+  },
+  {
+    "Nome": "Outro Nome",
+    "Nome de Usuário": "outro",
+    "Senha": "senha123"
+  }
+  // Adicione mais usuários conforme necessário
+]
